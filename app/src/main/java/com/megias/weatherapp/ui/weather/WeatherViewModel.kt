@@ -3,7 +3,7 @@ package com.megias.weatherapp.ui.weather
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.megias.weatherapp.data.repository.WeatherRepository
-import com.megias.weatherapp.ui.WeatherUiState
+import com.megias.weatherapp.ui.weather.WeatherUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow

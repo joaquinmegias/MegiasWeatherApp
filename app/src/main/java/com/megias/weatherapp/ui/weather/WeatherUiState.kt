@@ -1,4 +1,4 @@
-package com.megias.weatherapp.ui
+package com.megias.weatherapp.ui.weather
 
 import com.megias.weatherapp.data.remote.model.WeatherResponse
 
