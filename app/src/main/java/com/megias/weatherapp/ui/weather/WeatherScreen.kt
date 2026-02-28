@@ -1,9 +1,100 @@
 package com.megias.weatherapp.ui.weather
 
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.foundation.layout.*
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 
 @Composable
-fun WeatherScreen() {
-    Text(text = "Weather Screen")
+fun WeatherScreen(
+    viewModel: WeatherViewModel = hiltViewModel()
+) {
+
+    val uiState by viewModel.uiState.collectAsState()
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+
+        CitySelector(
+            onCitySelected = { city ->
+                viewModel.loadWeather(city)
+            }
+        )
+
+        Spacer(modifier = Modifier.height(24.dp))
+
+        when (uiState) {
+
+            WeatherUiState.Idle -> {
+                Text("Select a city")
+            }
+
+            WeatherUiState.Loading -> {
+                CircularProgressIndicator()
+            }
+
+            is WeatherUiState.Error -> {
+                Text(
+                    text = (uiState as WeatherUiState.Error).message,
+                    color = MaterialTheme.colorScheme.error
+                )
+            }
+
+            is WeatherUiState.Success -> {
+                val data = (uiState as WeatherUiState.Success).data
+                WeatherContent(data)
+            }
+        }
+    }
+}
+
+@Composable
+fun CitySelector(
+    onCitySelected: (String) -> Unit
+) {
+
+    val cities = listOf(
+        "Montevideo",
+        "London",
+        "São Paulo",
+        "Buenos Aires",
+        "Munich"
+    )
+
+    Column {
+        cities.forEach { city ->
+            Button(
+                onClick = { onCitySelected(city) },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 4.dp)
+            ) {
+                Text(city)
+            }
+        }
+    }
+}
+
+@Composable
+fun WeatherContent(data: com.megias.weatherapp.domain.model.Weather) {
+
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+
+        Text(text = data.cityName, style = MaterialTheme.typography.headlineMedium)
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        Text("Temperature: ${data.temperature} °C")
+        Text("Min: ${data.minTemperature} °C")
+        Text("Max: ${data.maxTemperature} °C")
+        Text("Wind: ${data.windSpeed} m/s")
+        Text("Description: ${data.description}")
+    }
 }

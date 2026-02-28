@@ -23,12 +23,10 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
-        val apiKey = project.findProperty("OPEN_WEATHER_API_KEY") as String? ?: ""
-
         buildConfigField(
             "String",
             "OPEN_WEATHER_API_KEY",
-            "\"$apiKey\""
+            "\"06cd1e10fb6339401c2109946137fee5\""
         )
     }
 
