@@ -32,4 +32,17 @@ class WeatherViewModel @Inject constructor(
             }
         }
     }
+
+    fun loadWeather(city: String) {
+        viewModelScope.launch {
+            _uiState.value = WeatherUiState.Loading
+            try {
+                val result = repository.getWeatherByCity(city)
+                _uiState.value = WeatherUiState.Success(result)
+            } catch (e: Exception) {
+                _uiState.value =
+                    WeatherUiState.Error(e.message ?: "error")
+            }
+        }
+    }
 }
