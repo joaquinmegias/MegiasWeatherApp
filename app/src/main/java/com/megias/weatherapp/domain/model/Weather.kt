@@ -7,6 +7,6 @@ data class Weather(
     val maxTemperature: Double,
     val windSpeed: Double,
     val windDegrees: Double,
-    val iconUrl: String,
+    val iconCode: String,
     val description: String
 )

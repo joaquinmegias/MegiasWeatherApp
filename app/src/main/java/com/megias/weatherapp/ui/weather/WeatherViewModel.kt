@@ -10,6 +10,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 @HiltViewModel
@@ -18,8 +19,8 @@ class WeatherViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<WeatherUiState>(WeatherUiState.Idle)
-    val uiState: StateFlow<WeatherUiState> = _uiState
-
+    val uiState: StateFlow<WeatherUiState> = _uiState.asStateFlow()
+    
     fun loadWeather(lat: Double, lon: Double) {
         viewModelScope.launch {
             _uiState.value = WeatherUiState.Loading
