@@ -1,138 +1,96 @@
 package com.megias.weatherapp.ui.weather
 
 import android.Manifest
+import android.content.res.Configuration
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Button
-import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import coil3.compose.AsyncImage
 
 @Composable
 fun WeatherScreen(
     viewModel: WeatherViewModel = hiltViewModel()
 ) {
-
+    val configuration = LocalConfiguration.current
+    val isLandscape = configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    val permissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission()
+    ) { granted ->
+        if (granted) viewModel.loadWeatherFromLocation()
+    }
 
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp),
+            .safeDrawingPadding()
+            .padding(horizontal = 16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-
-        CitySelector(
-            onCitySelected = { city ->
-                viewModel.loadWeather(city)
-            },
-            viewModel = viewModel
+        Spacer(Modifier.height(if (isLandscape) 4.dp else 24.dp))
+        Text(
+            text = "Weather App",
+            style = if (isLandscape) MaterialTheme.typography.titleLarge else MaterialTheme.typography.headlineMedium
         )
+        Spacer(Modifier.height(if (isLandscape) 8.dp else 16.dp))
 
-        Spacer(modifier = Modifier.height(24.dp))
-
-        when (val state = uiState) {
-
-            WeatherUiState.Idle -> {
-                Text("Select a city")
-            }
-
-            WeatherUiState.Loading -> {
-                CircularProgressIndicator()
-            }
-
-            is WeatherUiState.Error -> {
-                Text(
-                    text = state.message,
-                    color = MaterialTheme.colorScheme.error
-                )
-            }
-
-            is WeatherUiState.Success -> {
-                WeatherContent(state.data)
-            }
-        }
-    }
-}
-
-@Composable
-fun CitySelector(
-    onCitySelected: (String) -> Unit,
-    viewModel: WeatherViewModel
-) {
-    val permissionLauncher =
-        rememberLauncherForActivityResult(
-            contract = ActivityResultContracts.RequestPermission()
-        ) { granted ->
-            if (granted) {
-                viewModel.loadWeatherFromLocation()
-            }
-        }
-
-    val cities = listOf(
-        "Montevideo",
-        "London",
-        "São Paulo",
-        "Buenos Aires",
-        "Munich"
-    )
-
-    Column {
-        cities.forEach { city ->
-            Button(
-                onClick = { onCitySelected(city) },
+        if (isLandscape) {
+            Row(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 4.dp)
+                    .fillMaxSize(),
+                verticalAlignment = Alignment.Top
             ) {
-                Text(city)
+                Column(
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxHeight()
+                        .padding(end = 16.dp, bottom = 8.dp)
+                ) {
+                    CitySelector(
+                        modifier = Modifier.weight(1f),
+                        onCitySelected = { viewModel.loadWeather(it) })
+                    Spacer(Modifier.height(8.dp))
+                    LocationButton(onClick = { permissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION) })
+                }
+                Column(
+                    modifier = Modifier
+                        .weight(1.2f)
+                        .fillMaxHeight()
+                        .verticalScroll(rememberScrollState()),
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    WeatherStateContent(uiState)
+                }
+            }
+        } else {
+            CitySelector(
+                modifier = Modifier.heightIn(max = 250.dp),
+                onCitySelected = { viewModel.loadWeather(it) })
+            Spacer(Modifier.height(12.dp))
+            LocationButton(onClick = { permissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION) })
+            Spacer(Modifier.height(24.dp))
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+                    .verticalScroll(rememberScrollState()),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                WeatherStateContent(uiState)
             }
         }
-    }
-    Button(
-        onClick = {
-            permissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
-        },
-        modifier = Modifier.fillMaxWidth()
-    ) {
-        Text("Use my location")
-    }
-}
-
-@Composable
-fun WeatherContent(data: com.megias.weatherapp.domain.model.Weather) {
-
-    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-
-        Text(text = data.cityName, style = MaterialTheme.typography.headlineMedium)
-
-        val iconUrl = "https://openweathermap.org/img/wn/${data.iconCode}@2x.png"
-
-        AsyncImage(
-            model = iconUrl,
-            contentDescription = data.description
-        )
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        Text("Temperature: ${data.temperature} °C")
-        Text("Min: ${data.minTemperature} °C")
-        Text("Max: ${data.maxTemperature} °C")
-        Text("Wind: ${data.windSpeed} m/s")
-        Text("Description: ${data.description}")
     }
 }
