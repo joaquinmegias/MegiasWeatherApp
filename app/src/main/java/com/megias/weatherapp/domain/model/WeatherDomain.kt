@@ -1,6 +1,6 @@
 package com.megias.weatherapp.domain.model
 
-data class Weather(
+data class WeatherDomain(
     val cityName: String,
     val temperature: Double,
     val minTemperature: Double,

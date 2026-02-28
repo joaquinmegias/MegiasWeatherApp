@@ -9,22 +9,3 @@ data class WeatherResponseDto(
     val main: MainInfoDto,
     val wind: WindInfoDto
 )
-
-@Serializable
-data class WeatherItemDto(
-    val description: String,
-    val icon: String
-)
-
-@Serializable
-data class MainInfoDto(
-    val temp: Double,
-    val temp_min: Double,
-    val temp_max: Double
-)
-
-@Serializable
-data class WindInfoDto(
-    val speed: Double,
-    val deg: Double
-)

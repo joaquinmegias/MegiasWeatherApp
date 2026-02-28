@@ -25,7 +25,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
-import com.megias.weatherapp.domain.model.Weather
+import com.megias.weatherapp.domain.model.WeatherDomain
 
 @Composable
 fun LocationButton(onClick: () -> Unit) {
@@ -71,7 +71,7 @@ fun CitySelector(
 }
 
 @Composable
-fun WeatherContent(data: Weather) {
+fun WeatherContent(data: WeatherDomain) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
