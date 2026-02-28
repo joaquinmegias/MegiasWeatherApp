@@ -3,7 +3,8 @@ package com.megias.weatherapp.ui.weather
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.megias.weatherapp.data.location.LocationProvider
-import com.megias.weatherapp.data.repository.WeatherRepository
+import com.megias.weatherapp.domain.usecase.GetWeatherByCityUseCase
+import com.megias.weatherapp.domain.usecase.GetWeatherByLocationUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -13,7 +14,8 @@ import kotlinx.coroutines.launch
 
 @HiltViewModel
 class WeatherViewModel @Inject constructor(
-    private val repository: WeatherRepository,
+    private val getWeatherByCityUseCase: GetWeatherByCityUseCase,
+    private val getWeatherByLocationUseCase: GetWeatherByLocationUseCase,
     private val locationProvider: LocationProvider
 ) : ViewModel() {
 
@@ -30,7 +32,7 @@ class WeatherViewModel @Inject constructor(
             _uiState.value = WeatherUiState.Loading
 
             try {
-                val result = repository.getWeatherByCity(city)
+                val result = getWeatherByCityUseCase(city)
                 _uiState.value = WeatherUiState.Success(result)
             } catch (e: Exception) {
                 _uiState.value =
@@ -53,7 +55,7 @@ class WeatherViewModel @Inject constructor(
 
                 if (location != null) {
                     val (lat, lon) = location
-                    val result = repository.getWeather(lat, lon)
+                    val result = getWeatherByLocationUseCase(lat, lon)
                     _uiState.value = WeatherUiState.Success(result)
                 } else {
                     _uiState.value =

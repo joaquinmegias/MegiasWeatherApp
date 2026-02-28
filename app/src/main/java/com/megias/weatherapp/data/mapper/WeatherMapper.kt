@@ -4,17 +4,16 @@ import com.megias.weatherapp.data.remote.model.WeatherResponseDto
 import com.megias.weatherapp.domain.model.WeatherDomain
 
 fun WeatherResponseDto.toDomain(): WeatherDomain {
-
     val weatherItem = weather.firstOrNull()
 
     return WeatherDomain(
-        cityName = name,
+        cityName = name.ifBlank { "—" },
         temperature = main.temp,
-        minTemperature = main.tempMin,
-        maxTemperature = main.tempMax,
-        windSpeed = wind.speed,
-        windDegrees = wind.deg,
-        iconCode = weatherItem?.icon ?: "",
-        description = weatherItem?.description ?: ""
+        minTemperature = main.temp_Min,
+        maxTemperature = main.temp_Max,
+        windSpeed = wind?.speed,
+        windDegrees = wind?.deg,
+        iconCode = weatherItem?.icon.orEmpty(),
+        description = weatherItem?.description.orEmpty()
     )
 }

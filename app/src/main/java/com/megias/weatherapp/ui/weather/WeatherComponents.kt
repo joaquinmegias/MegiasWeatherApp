@@ -97,10 +97,10 @@ fun WeatherContent(data: WeatherDomain) {
             Text(text = "${data.temperature} °C", style = MaterialTheme.typography.headlineLarge)
 
             Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                Text("Min: ${data.minTemperature}°")
-                Text("Max: ${data.maxTemperature}°")
+                Text("Min: ${data.minTemperature?.toString() ?: "—"}°")
+                Text("Max: ${data.maxTemperature?.toString() ?: "—"}°")
             }
-            Text("Wind: ${data.windSpeed} m/s")
+            Text("Wind: ${data.windSpeed?.toString() ?: "—"} m/s")
 
             Spacer(modifier = Modifier.height(8.dp))
 

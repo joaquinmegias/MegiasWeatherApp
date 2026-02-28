@@ -5,6 +5,6 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class MainInfoDto(
     val temp: Double,
-    val tempMin: Double,
-    val tempMax: Double
+    val temp_Min: Double? = null,
+    val temp_Max: Double? = null,
 )

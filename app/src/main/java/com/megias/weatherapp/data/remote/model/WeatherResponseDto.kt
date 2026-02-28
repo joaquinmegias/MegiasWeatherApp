@@ -5,7 +5,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class WeatherResponseDto(
     val name: String,
-    val weather: List<WeatherItemDto>,
+    val weather: List<WeatherItemDto> = emptyList(),
     val main: MainInfoDto,
-    val wind: WindInfoDto
+    val wind: WindInfoDto? = null
 )
