@@ -1,6 +1,6 @@
 package com.megias.weatherapp.data.remote
 
-import com.megias.weatherapp.data.remote.model.WeatherResponse
+import com.megias.weatherapp.data.remote.model.WeatherResponseDto
 import retrofit2.http.GET
 import retrofit2.http.Query
 
@@ -12,12 +12,12 @@ interface WeatherApi {
         @Query("lon") lon: Double,
         @Query("appid") apiKey: String,
         @Query("units") units: String = "metric",
-    ): WeatherResponse
+    ): WeatherResponseDto
 
     @GET("data/2.5/weather")
     suspend fun getWeatherByCity(
         @Query("q") city: String,
         @Query("appid") apiKey: String,
         @Query("units") units: String = "metric"
-    ): WeatherResponse
+    ): WeatherResponseDto
 }
