@@ -41,7 +41,7 @@ fun WeatherScreen(
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        when (uiState) {
+        when (val state = uiState) {
 
             WeatherUiState.Idle -> {
                 Text("Select a city")
@@ -53,14 +53,13 @@ fun WeatherScreen(
 
             is WeatherUiState.Error -> {
                 Text(
-                    text = (uiState as WeatherUiState.Error).message,
+                    text = state.message,
                     color = MaterialTheme.colorScheme.error
                 )
             }
 
             is WeatherUiState.Success -> {
-                val data = (uiState as WeatherUiState.Success).data
-                WeatherContent(data)
+                WeatherContent(state.data)
             }
         }
     }
