@@ -9,8 +9,8 @@ fun WeatherResponseDto.toDomain(): WeatherDomain {
     return WeatherDomain(
         cityName = name.ifBlank { "—" },
         temperature = main.temp,
-        minTemperature = main.temp_Min,
-        maxTemperature = main.temp_Max,
+        minTemperature = main.temp_min,
+        maxTemperature = main.temp_max,
         windSpeed = wind?.speed,
         windDegrees = wind?.deg,
         iconCode = weatherItem?.icon.orEmpty(),
