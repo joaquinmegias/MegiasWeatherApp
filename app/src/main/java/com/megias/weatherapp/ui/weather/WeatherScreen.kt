@@ -1,5 +1,8 @@
 package com.megias.weatherapp.ui.weather
 
+import android.Manifest
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -36,7 +39,8 @@ fun WeatherScreen(
         CitySelector(
             onCitySelected = { city ->
                 viewModel.loadWeather(city)
-            }
+            },
+            viewModel = viewModel
         )
 
         Spacer(modifier = Modifier.height(24.dp))
@@ -67,8 +71,17 @@ fun WeatherScreen(
 
 @Composable
 fun CitySelector(
-    onCitySelected: (String) -> Unit
+    onCitySelected: (String) -> Unit,
+    viewModel: WeatherViewModel
 ) {
+    val permissionLauncher =
+        rememberLauncherForActivityResult(
+            contract = ActivityResultContracts.RequestPermission()
+        ) { granted ->
+            if (granted) {
+                viewModel.loadWeatherFromLocation()
+            }
+        }
 
     val cities = listOf(
         "Montevideo",
@@ -89,6 +102,14 @@ fun CitySelector(
                 Text(city)
             }
         }
+    }
+    Button(
+        onClick = {
+            permissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+        },
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Text("Use my location")
     }
 }
 

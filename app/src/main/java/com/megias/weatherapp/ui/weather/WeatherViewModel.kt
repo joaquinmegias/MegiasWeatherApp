@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.megias.weatherapp.BuildConfig
+import com.megias.weatherapp.data.location.LocationProvider
 import com.megias.weatherapp.data.repository.WeatherRepository
 import com.megias.weatherapp.ui.weather.WeatherUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -15,12 +16,13 @@ import kotlinx.coroutines.launch
 
 @HiltViewModel
 class WeatherViewModel @Inject constructor(
-    private val repository: WeatherRepository
+    private val repository: WeatherRepository,
+    private val locationProvider: LocationProvider
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<WeatherUiState>(WeatherUiState.Idle)
     val uiState: StateFlow<WeatherUiState> = _uiState.asStateFlow()
-    
+
     fun loadWeather(lat: Double, lon: Double) {
         viewModelScope.launch {
             _uiState.value = WeatherUiState.Loading
@@ -46,6 +48,24 @@ class WeatherViewModel @Inject constructor(
             } catch (e: Exception) {
                 _uiState.value =
                     WeatherUiState.Error(e.message ?: "error")
+            }
+        }
+    }
+
+    fun loadWeatherFromLocation() {
+        viewModelScope.launch {
+            _uiState.value = WeatherUiState.Loading
+            try {
+                val location = locationProvider.getLastLocation()
+                if (location != null) {
+                    val (lat, lon) = location
+                    val result = repository.getWeather(lat, lon)
+                    _uiState.value = WeatherUiState.Success(result)
+                } else {
+                    _uiState.value = WeatherUiState.Error("Location unavailable")
+                }
+            } catch (e: Exception) {
+                _uiState.value = WeatherUiState.Error(e.message ?: "error")
             }
         }
     }
