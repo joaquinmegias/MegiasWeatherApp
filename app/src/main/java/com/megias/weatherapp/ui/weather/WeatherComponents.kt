@@ -114,17 +114,35 @@ fun WeatherContent(data: Weather) {
 }
 
 @Composable
-fun WeatherStateContent(uiState: WeatherUiState) {
+fun WeatherStateContent(
+    uiState: WeatherUiState,
+    onRetry: () -> Unit
+) {
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         when (uiState) {
             WeatherUiState.Idle -> Text("Select a city", style = MaterialTheme.typography.bodyLarge)
             WeatherUiState.Loading -> CircularProgressIndicator()
-            is WeatherUiState.Error -> Text(
-                text = uiState.message,
-                color = MaterialTheme.colorScheme.error,
-                textAlign = TextAlign.Center,
-                modifier = Modifier.padding(16.dp)
-            )
+            is WeatherUiState.Error -> {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    Text(
+                        text = uiState.message,
+                        color = MaterialTheme.colorScheme.error,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.padding(16.dp)
+                    )
+
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    Button(
+                        onClick = onRetry,
+                        shape = RoundedCornerShape(12.dp)
+                    ) { Text("Retry") }
+                }
+            }
+
             is WeatherUiState.Success -> WeatherContent(uiState.data)
         }
     }

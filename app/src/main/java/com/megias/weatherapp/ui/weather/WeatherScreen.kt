@@ -4,7 +4,16 @@ import android.Manifest
 import android.content.res.Configuration
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
@@ -42,7 +51,8 @@ fun WeatherScreen(
         Spacer(Modifier.height(if (isLandscape) 4.dp else 24.dp))
         Text(
             text = "Weather App",
-            style = if (isLandscape) MaterialTheme.typography.titleLarge else MaterialTheme.typography.headlineMedium
+            style = if (isLandscape) MaterialTheme.typography.titleLarge
+            else MaterialTheme.typography.headlineMedium
         )
         Spacer(Modifier.height(if (isLandscape) 8.dp else 16.dp))
 
@@ -72,7 +82,7 @@ fun WeatherScreen(
                     verticalArrangement = Arrangement.Center,
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    WeatherStateContent(uiState)
+                    WeatherStateContent(uiState, onRetry = { viewModel.retry() })
                 }
             }
         } else {
@@ -80,7 +90,9 @@ fun WeatherScreen(
                 modifier = Modifier.heightIn(max = 250.dp),
                 onCitySelected = { viewModel.loadWeather(it) })
             Spacer(Modifier.height(12.dp))
-            LocationButton(onClick = { permissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION) })
+            LocationButton(onClick = {
+                permissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+            })
             Spacer(Modifier.height(24.dp))
             Column(
                 modifier = Modifier
@@ -89,7 +101,7 @@ fun WeatherScreen(
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                WeatherStateContent(uiState)
+                WeatherStateContent(uiState, onRetry = { viewModel.retry() })
             }
         }
     }

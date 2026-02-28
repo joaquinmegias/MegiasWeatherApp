@@ -1,12 +1,9 @@
 package com.megias.weatherapp.ui.weather
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.megias.weatherapp.BuildConfig
 import com.megias.weatherapp.data.location.LocationProvider
 import com.megias.weatherapp.data.repository.WeatherRepository
-import com.megias.weatherapp.ui.weather.WeatherUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -22,50 +19,62 @@ class WeatherViewModel @Inject constructor(
 
     private val _uiState = MutableStateFlow<WeatherUiState>(WeatherUiState.Idle)
     val uiState: StateFlow<WeatherUiState> = _uiState.asStateFlow()
-
-    fun loadWeather(lat: Double, lon: Double) {
-        viewModelScope.launch {
-            _uiState.value = WeatherUiState.Loading
-
-            try {
-                val response = repository.getWeather(lat, lon)
-                _uiState.value = WeatherUiState.Success(response)
-            } catch (e: Exception) {
-                _uiState.value = WeatherUiState.Error(
-                    e.message ?: "error"
-                )
-            }
-        }
-    }
+    private var lastCityRequested: String? = null
+    private var lastRequestWasLocation: Boolean = false
 
     fun loadWeather(city: String) {
         viewModelScope.launch {
-            Log.d("API_KEY", BuildConfig.OPEN_WEATHER_API_KEY)
+            lastCityRequested = city
+            lastRequestWasLocation = false
+
             _uiState.value = WeatherUiState.Loading
+
             try {
                 val result = repository.getWeatherByCity(city)
                 _uiState.value = WeatherUiState.Success(result)
             } catch (e: Exception) {
                 _uiState.value =
-                    WeatherUiState.Error(e.message ?: "error")
+                    WeatherUiState.Error(
+                        e.message ?: "Unable to fetch weather data"
+                    )
             }
         }
     }
 
     fun loadWeatherFromLocation() {
         viewModelScope.launch {
+            lastCityRequested = null
+            lastRequestWasLocation = true
+
             _uiState.value = WeatherUiState.Loading
+
             try {
                 val location = locationProvider.getLastLocation()
+
                 if (location != null) {
                     val (lat, lon) = location
                     val result = repository.getWeather(lat, lon)
                     _uiState.value = WeatherUiState.Success(result)
                 } else {
-                    _uiState.value = WeatherUiState.Error("Location unavailable")
+                    _uiState.value =
+                        WeatherUiState.Error("Location unavailable")
                 }
+
             } catch (e: Exception) {
-                _uiState.value = WeatherUiState.Error(e.message ?: "error")
+                _uiState.value =
+                    WeatherUiState.Error(
+                        e.message ?: "Unable to fetch location weather"
+                    )
+            }
+        }
+    }
+
+    fun retry() {
+        if (lastRequestWasLocation) {
+            loadWeatherFromLocation()
+        } else {
+            lastCityRequested?.let {
+                loadWeather(it)
             }
         }
     }
